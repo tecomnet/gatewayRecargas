@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TecomNet.DomainService.Core\TecomNet.DomainService.Core.csproj" />
+    <ProjectReference Include="..\TecomNet.Infrastructure.WebServices\TecomNet.Infrastructure.WebServices.csproj" />
+  </ItemGroup>
+
 </Project>
