@@ -10,4 +10,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TecomNet.DomainService.Core\TecomNet.DomainService.Core.csproj" />
+  </ItemGroup>
+
 </Project>

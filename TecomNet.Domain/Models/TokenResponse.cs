@@ -2,22 +2,23 @@
 
 namespace TecomNet.Domain.Models
 {
-    public class GetToken
+    public class TokenResponse
     {
         [JsonPropertyName("accesToken")]
-        public string AccesToken { get; set; }
+        public string? AccesToken { get; set; }
         [JsonPropertyName("clientId")]
-        public string ClientId { get; set; }
+        public string? ClientId { get; set; }
         [JsonPropertyName("tokenType")]
-        public string TokenType { get; set; }
+        public string? TokenType { get; set; }
         [JsonPropertyName("issuedAt")]
-        public string IssuedAt { get; set; }
+        public string? IssuedAt { get; set; }
         [JsonPropertyName("expiresIn")]
-        public string ExpiresIn { get; set; }
+        public string? ExpiresIn { get; set; }
         [JsonPropertyName("status")]
-        public string Status { get; set; }
+        public string? Status { get; set; }
         [JsonPropertyName("scopes")]
-        public string Scopes { get; set; }
+        public string? Scopes { get; set; }
+        public string? AccessToken { get; set; }
 
         public int GetExpiresInSeconds()
         {
