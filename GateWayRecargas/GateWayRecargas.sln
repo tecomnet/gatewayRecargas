@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GateWayRecargas", "GateWayRecargas.csproj", "{02943ABD-F225-4154-BE68-C6F22EC8159D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{7A72997B-D5AA-484E-BB65-60CB3697DE9A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{FE918BC5-B9C8-4774-A29C-128A84B102DC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{79FF2A5F-73CA-448A-A0A1-FF79BB57A57F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{31A15C74-92FA-4501-B607-4179AD98891C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecomNet.Domain", "..\TecomNet.Domain\TecomNet.Domain.csproj", "{F35EB3A3-70DC-4ECC-B420-138CBE4E4769}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TecomNet.Common", "..\TecomNet.Common\TecomNet.Common.csproj", "{4353CA2E-75B8-4C95-8F14-5777AA437070}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{02943ABD-F225-4154-BE68-C6F22EC8159D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02943ABD-F225-4154-BE68-C6F22EC8159D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02943ABD-F225-4154-BE68-C6F22EC8159D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02943ABD-F225-4154-BE68-C6F22EC8159D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F35EB3A3-70DC-4ECC-B420-138CBE4E4769}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F35EB3A3-70DC-4ECC-B420-138CBE4E4769}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F35EB3A3-70DC-4ECC-B420-138CBE4E4769}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F35EB3A3-70DC-4ECC-B420-138CBE4E4769}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4353CA2E-75B8-4C95-8F14-5777AA437070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4353CA2E-75B8-4C95-8F14-5777AA437070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4353CA2E-75B8-4C95-8F14-5777AA437070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4353CA2E-75B8-4C95-8F14-5777AA437070}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02943ABD-F225-4154-BE68-C6F22EC8159D} = {31A15C74-92FA-4501-B607-4179AD98891C}
+		{F35EB3A3-70DC-4ECC-B420-138CBE4E4769} = {FE918BC5-B9C8-4774-A29C-128A84B102DC}
+		{4353CA2E-75B8-4C95-8F14-5777AA437070} = {7A72997B-D5AA-484E-BB65-60CB3697DE9A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB661DF8-233C-4B8C-B700-B737F30F5061}
+	EndGlobalSection
+EndGlobal
