@@ -11,7 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TecomNet.Domain\TecomNet.Domain.csproj" />
     <ProjectReference Include="..\TecomNet.DomainService.Core\TecomNet.DomainService.Core.csproj" />
+    <ProjectReference Include="..\TecomNet.Domain.Service\TecomNet.Domain.Service.csproj" />
+    <ProjectReference Include="..\TecomNet.Infrastructure.WebServices\TecomNet.Infrastructure.WebServices.csproj" />
   </ItemGroup>
 
 </Project>
