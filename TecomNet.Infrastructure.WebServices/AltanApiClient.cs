@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TecomNet.Domain.Models;
 
-namespace TecomNet.Infrastructure.WebApi.Clients;
+namespace TecomNet.Infrastructure.WebServices;
 
 public class AltanApiClient
 {
@@ -30,7 +30,16 @@ public class AltanApiClient
             var consumerKey = _configuration["AltanApi:ConsumerKey"] ?? string.Empty;
             var consumerSecret = _configuration["AltanApi:ConsumerSecret"] ?? string.Empty;
 
+            if (string.IsNullOrWhiteSpace(consumerKey) || string.IsNullOrWhiteSpace(consumerSecret))
+            {
+                _logger.LogError("Las credenciales de AltanApi no están configuradas. Verifique ConsumerKey y ConsumerSecret en appsettings.json");
+                throw new InvalidOperationException("Las credenciales de AltanApi no están configuradas. Verifique ConsumerKey y ConsumerSecret en appsettings.json");
+            }
+
             var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{consumerKey}:{consumerSecret}"));
+
+            _logger.LogInformation("Solicitando token de acceso a Altan API. Endpoint: {Endpoint}", endpoint);
+            _logger.LogDebug("Authorization Basic generado: {Credentials}", credentials);
 
             var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);
@@ -40,20 +49,45 @@ public class AltanApiClient
 
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Error obteniendo token: {StatusCode} - {Content}", response.StatusCode, content);
-                throw new HttpRequestException($"Error al obtener token: {response.StatusCode} - {content}");
+                _logger.LogError("Error obteniendo token de Altan API. StatusCode: {StatusCode}, Content: {Content}", response.StatusCode, content);
+                throw new HttpRequestException($"Error al obtener token de Altan API: {response.StatusCode} - {content}");
             }
+
+            _logger.LogInformation("Token de acceso obtenido exitosamente. StatusCode: {StatusCode}", response.StatusCode);
 
             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(content, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            return tokenResponse ?? throw new InvalidOperationException("No se pudo deserializar la respuesta del token");
+            if (tokenResponse == null)
+            {
+                _logger.LogError("No se pudo deserializar la respuesta del token. Content: {Content}", content);
+                throw new InvalidOperationException("No se pudo deserializar la respuesta del token");
+            }
+
+            if (string.IsNullOrWhiteSpace(tokenResponse.AccessToken))
+            {
+                _logger.LogError("El token de acceso está vacío en la respuesta");
+                throw new InvalidOperationException("El token de acceso está vacío en la respuesta");
+            }
+
+            _logger.LogInformation("Token de acceso procesado correctamente. ClientId: {ClientId}, TokenType: {TokenType}, Status: {Status}", 
+                tokenResponse.ClientId, tokenResponse.TokenType, tokenResponse.Status);
+
+            return tokenResponse;
+        }
+        catch (HttpRequestException)
+        {
+            throw;
+        }
+        catch (InvalidOperationException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error al obtener access token");
+            _logger.LogError(ex, "Error inesperado al obtener access token de Altan API");
             throw;
         }
     }

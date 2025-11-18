@@ -1,6 +1,5 @@
 @GateWayRecargas_HostAddress = http://localhost:5065
 
-GET {{GateWayRecargas_HostAddress}}/weatherforecast/
+POST {{GateWayRecargas_HostAddress}}/api/v1.0/Token
 Accept: application/json
-
-###
+Content-Type: application/json

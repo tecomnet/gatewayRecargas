@@ -4,8 +4,8 @@ namespace TecomNet.Domain.Models
 {
     public class TokenResponse
     {
-        [JsonPropertyName("accesToken")]
-        public string? AccesToken { get; set; }
+        [JsonPropertyName("accessToken")]
+        public string? AccessToken { get; set; }
         [JsonPropertyName("clientId")]
         public string? ClientId { get; set; }
         [JsonPropertyName("tokenType")]
@@ -18,7 +18,6 @@ namespace TecomNet.Domain.Models
         public string? Status { get; set; }
         [JsonPropertyName("scopes")]
         public string? Scopes { get; set; }
-        public string? AccessToken { get; set; }
 
         public int GetExpiresInSeconds()
         {
@@ -27,6 +26,14 @@ namespace TecomNet.Domain.Models
                 return seconds;
             }
             return 0;
+        }
+        public DateTime? GetIssuedAtDateTime()
+        {
+            if (long.TryParse(IssuedAt, out var timestamp))
+            {
+                return DateTimeOffset.FromUnixTimeMilliseconds(timestamp).DateTime;
+            }
+            return null;
         }
     }
 }
