@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using TecomNet.Domain.Models;
+﻿using TecomNet.Domain.Models;
 
 namespace TecomNet.DomainService.Core.Services
 {

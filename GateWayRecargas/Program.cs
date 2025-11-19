@@ -21,6 +21,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// HTTPS redirection
+// Nota: Si ejecutas solo con HTTP, verás un warning pero no afecta la funcionalidad
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

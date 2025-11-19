@@ -24,8 +24,47 @@ public class AltanApiClient
     {
         try
         {
-            var endpoint = _configuration["AltanApi:TokenEndpoint"]
-                ?? "https://apigee-prod.altanredes.com/v1/oauth/accesstoken?grant-type=client_credentials";
+            // Construir endpoint dinámicamente usando BaseUrl o usar TokenEndpoint completo si está configurado
+            var tokenEndpoint = _configuration["AltanApi:TokenEndpoint"];
+            string endpoint;
+            string baseUrl;
+
+            if (!string.IsNullOrWhiteSpace(tokenEndpoint))
+            {
+                // Si TokenEndpoint está configurado completamente, usarlo (compatibilidad hacia atrás)
+                endpoint = tokenEndpoint;
+                // Extraer BaseUrl del endpoint para verificación
+                var uri = new Uri(endpoint);
+                baseUrl = $"{uri.Scheme}://{uri.Host}";
+            }
+            else
+            {
+                // Construir endpoint usando BaseUrl
+                baseUrl = _configuration["AltanApi:BaseUrl"] 
+                    ?? "https://apigee-prod.altanredes.com/cm";
+                
+                // Asegurar que BaseUrl no termine con /
+                baseUrl = baseUrl.TrimEnd('/');
+                
+                // El endpoint de token OAuth siempre está en la raíz de la API
+                // Removemos /cm-sandbox o /cm del BaseUrl para construir el endpoint de token
+                var tokenBaseUrl = baseUrl;
+                if (tokenBaseUrl.Contains("/cm-sandbox", StringComparison.OrdinalIgnoreCase))
+                {
+                    tokenBaseUrl = tokenBaseUrl.Replace("/cm-sandbox", "", StringComparison.OrdinalIgnoreCase);
+                }
+                else if (tokenBaseUrl.Contains("/cm", StringComparison.OrdinalIgnoreCase) && !tokenBaseUrl.Contains("/cm-sandbox", StringComparison.OrdinalIgnoreCase))
+                {
+                    tokenBaseUrl = tokenBaseUrl.Replace("/cm", "", StringComparison.OrdinalIgnoreCase);
+                }
+                
+                endpoint = $"{tokenBaseUrl}/v1/oauth/accesstoken?grant-type=client_credentials";
+            }
+
+            // Verificar si se está usando sandbox
+            // Sandbox tiene /cm-sandbox, Producción tiene /cm
+            var isSandbox = baseUrl.Contains("cm-sandbox", StringComparison.OrdinalIgnoreCase);
+            var environment = isSandbox ? "SANDBOX" : "PRODUCCIÓN";
 
             var consumerKey = _configuration["AltanApi:ConsumerKey"] ?? string.Empty;
             var consumerSecret = _configuration["AltanApi:ConsumerSecret"] ?? string.Empty;
@@ -38,7 +77,11 @@ public class AltanApiClient
 
             var credentials = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{consumerKey}:{consumerSecret}"));
 
-            _logger.LogInformation("Solicitando token de acceso a Altan API. Endpoint: {Endpoint}", endpoint);
+            _logger.LogInformation("=== CONFIGURACIÓN ALTAN API ===");
+            _logger.LogInformation("Ambiente: {Environment}", environment);
+            _logger.LogInformation("BaseUrl: {BaseUrl}", baseUrl);
+            _logger.LogInformation("Endpoint completo: {Endpoint}", endpoint);
+            _logger.LogInformation("Solicitando token de acceso a Altan API ({Environment})", environment);
             _logger.LogDebug("Authorization Basic generado: {Credentials}", credentials);
 
             var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
@@ -53,7 +96,7 @@ public class AltanApiClient
                 throw new HttpRequestException($"Error al obtener token de Altan API: {response.StatusCode} - {content}");
             }
 
-            _logger.LogInformation("Token de acceso obtenido exitosamente. StatusCode: {StatusCode}", response.StatusCode);
+            _logger.LogInformation("Token de acceso obtenido exitosamente desde {Environment}. StatusCode: {StatusCode}", environment, response.StatusCode);
 
             var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(content, new JsonSerializerOptions
             {
@@ -72,8 +115,8 @@ public class AltanApiClient
                 throw new InvalidOperationException("El token de acceso está vacío en la respuesta");
             }
 
-            _logger.LogInformation("Token de acceso procesado correctamente. ClientId: {ClientId}, TokenType: {TokenType}, Status: {Status}", 
-                tokenResponse.ClientId, tokenResponse.TokenType, tokenResponse.Status);
+            _logger.LogInformation("Token de acceso procesado correctamente ({Environment}). ClientId: {ClientId}, TokenType: {TokenType}, Status: {Status}", 
+                environment, tokenResponse.ClientId, tokenResponse.TokenType, tokenResponse.Status);
 
             return tokenResponse;
         }
