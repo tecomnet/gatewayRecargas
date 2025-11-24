@@ -6,5 +6,7 @@ namespace TecomNet.DomainService.Core.Services
     public interface IAltanApiService
     {
         Task<TokenResponse> GetAccessTokenAsync(CancellationToken cancellationToken = default);
+        Task<MsisdnInformationResponse> GetMsisdnInformationAsync(string msisdn, CancellationToken cancellationToken = default);
+        Task<MsisdnInformationResponse> GetMsisdnInformationAsync(string msisdn, string accessToken, CancellationToken cancellationToken = default);
     }
 }
