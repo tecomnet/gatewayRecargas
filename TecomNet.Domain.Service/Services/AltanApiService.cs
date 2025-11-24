@@ -47,6 +47,53 @@ namespace TecomNet.Domain.Service.Services
                 throw;
             }
         }
+
+        public async Task<MsisdnInformationResponse> GetMsisdnInformationAsync(string msisdn, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                // Obtener token de acceso (usará caché si está disponible)
+                var token = await GetAccessTokenAsync(cancellationToken);
+                
+                if (string.IsNullOrWhiteSpace(token.AccessToken))
+                {
+                    _logger.LogError("No se pudo obtener un token de acceso válido para consultar MSISDN");
+                    throw new InvalidOperationException("No se pudo obtener un token de acceso válido");
+                }
+
+                _logger.LogInformation("Consultando información de MSISDN: {Msisdn}", msisdn);
+                var msisdnInfo = await _altanApiClient.GetMsisdnInformationAsync(msisdn, token.AccessToken, cancellationToken);
+                
+                return msisdnInfo;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener información de MSISDN");
+                throw;
+            }
+        }
+
+        public async Task<MsisdnInformationResponse> GetMsisdnInformationAsync(string msisdn, string accessToken, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(accessToken))
+                {
+                    _logger.LogError("Token de acceso no proporcionado para consultar MSISDN");
+                    throw new ArgumentException("Token de acceso es requerido", nameof(accessToken));
+                }
+
+                _logger.LogInformation("Consultando información de MSISDN con token proporcionado: {Msisdn}", msisdn);
+                var msisdnInfo = await _altanApiClient.GetMsisdnInformationAsync(msisdn, accessToken, cancellationToken);
+                
+                return msisdnInfo;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener información de MSISDN con token proporcionado");
+                throw;
+            }
+        }
     }
 }
 
