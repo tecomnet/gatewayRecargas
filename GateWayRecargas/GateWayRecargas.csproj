@@ -15,6 +15,7 @@
     <ProjectReference Include="..\TecomNet.DomainService.Core\TecomNet.DomainService.Core.csproj" />
     <ProjectReference Include="..\TecomNet.Domain.Service\TecomNet.Domain.Service.csproj" />
     <ProjectReference Include="..\TecomNet.Infrastructure.WebServices\TecomNet.Infrastructure.WebServices.csproj" />
+    <ProjectReference Include="..\TecomNet.Infrastructure.Sql\TecomNet.Infrastructure.Sql.csproj" />
   </ItemGroup>
 
 </Project>
