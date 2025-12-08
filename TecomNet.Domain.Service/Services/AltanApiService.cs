@@ -94,6 +94,53 @@ namespace TecomNet.Domain.Service.Services
                 throw;
             }
         }
+
+        public async Task<PurchaseProductResponse> PurchaseProductAsync(PurchaseProductRequest request, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                // Obtener token de acceso (usará caché si está disponible)
+                var token = await GetAccessTokenAsync(cancellationToken);
+                
+                if (string.IsNullOrWhiteSpace(token.AccessToken))
+                {
+                    _logger.LogError("No se pudo obtener un token de acceso válido para comprar producto");
+                    throw new InvalidOperationException("No se pudo obtener un token de acceso válido");
+                }
+
+                _logger.LogInformation("Comprando producto para MSISDN: {Msisdn}", request.Msisdn);
+                var purchaseResponse = await _altanApiClient.PurchaseProductAsync(request, token.AccessToken, cancellationToken);
+                
+                return purchaseResponse;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al comprar producto");
+                throw;
+            }
+        }
+
+        public async Task<PurchaseProductResponse> PurchaseProductAsync(PurchaseProductRequest request, string accessToken, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(accessToken))
+                {
+                    _logger.LogError("Token de acceso no proporcionado para comprar producto");
+                    throw new ArgumentException("Token de acceso es requerido", nameof(accessToken));
+                }
+
+                _logger.LogInformation("Comprando producto con token proporcionado para MSISDN: {Msisdn}", request.Msisdn);
+                var purchaseResponse = await _altanApiClient.PurchaseProductAsync(request, accessToken, cancellationToken);
+                
+                return purchaseResponse;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al comprar producto con token proporcionado");
+                throw;
+            }
+        }
     }
 }
 
