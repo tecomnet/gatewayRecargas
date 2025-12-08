@@ -13,21 +13,22 @@ public class AltanTransaccionRecargaConfiguration : IEntityTypeConfiguration<Alt
         // Clave primaria
         builder.HasKey(t => t.IdTransaccion);
 
-        // Configuración de columnas - Campos de fecha de transacción
+        // Configuración de IdTransaccion
         builder.Property(t => t.IdTransaccion)
             .HasColumnName("IdTransaccion")
             .IsRequired()
             .ValueGeneratedOnAdd(); // IDENTITY column
 
+        // Campos de timestamps de transacción principal
         builder.Property(t => t.InicioTransaccionCanalDeVenta)
             .HasColumnName("InicioTransaccionCanalDeVenta")
             .HasColumnType("datetime2(0)")
-            .IsRequired(false);
+            .IsRequired();
 
         builder.Property(t => t.InicioTransaccionAltan)
             .HasColumnName("InicioTransaccionAltan")
             .HasColumnType("datetime2(0)")
-            .IsRequired(false);
+            .IsRequired();
 
         builder.Property(t => t.FinTransaccionAltan)
             .HasColumnName("FinTransaccionAltan")
@@ -73,37 +74,41 @@ public class AltanTransaccionRecargaConfiguration : IEntityTypeConfiguration<Alt
         builder.Property(t => t.IdPOS)
             .HasColumnName("IdPOS")
             .HasMaxLength(50)
-            .IsRequired(false);
+            .IsRequired();
 
         builder.Property(t => t.OrderId)
             .HasColumnName("OrderId")
             .HasMaxLength(50)
-            .IsRequired(false);
+            .IsRequired();
 
         builder.Property(t => t.ResultadoTransaccion)
             .HasColumnName("ResultadoTransaccion")
             .HasMaxLength(20)
-            .IsRequired(false);
+            .IsRequired();
 
         // Campos de reversa
-        builder.Property(t => t.InicioTransaccionAltanReversa)
-            .HasColumnName("InicioTransaccionAltanReversa")
+        builder.Property(t => t.AplicaReverso)
+            .HasColumnName("AplicaReverso")
+            .IsRequired(false);
+
+        builder.Property(t => t.InicioTransaccionReversa)
+            .HasColumnName("InicioTransaccionReversa")
             .HasColumnType("datetime2(0)")
             .IsRequired(false);
 
-        builder.Property(t => t.FinTransaccionAltanReversa)
-            .HasColumnName("FinTransaccionAltanReversa")
+        builder.Property(t => t.InicioTransaccionReversaAltan)
+            .HasColumnName("InicioTransaccionReversaAltan")
             .HasColumnType("datetime2(0)")
             .IsRequired(false);
 
-        builder.Property(t => t.FinTransaccionCanalDeVentaReversa)
-            .HasColumnName("FinTransaccionCanalDeVentaReversa")
+        builder.Property(t => t.FinTransaccionReversaAltan)
+            .HasColumnName("FinTransaccionReversaAltan")
             .HasColumnType("datetime2(0)")
             .IsRequired(false);
 
-        builder.Property(t => t.MontoRecargaReversa)
-            .HasColumnName("MontoRecargaReversa")
-            .HasColumnType("decimal(10,2)")
+        builder.Property(t => t.FinTransaccionReversa)
+            .HasColumnName("FinTransaccionReversa")
+            .HasColumnType("datetime2(0)")
             .IsRequired(false);
 
         builder.Property(t => t.OrderIdReversa)
@@ -126,11 +131,9 @@ public class AltanTransaccionRecargaConfiguration : IEntityTypeConfiguration<Alt
             .HasDatabaseName("IX_AltanTransaccionesRecargas_MSISDN");
 
         builder.HasIndex(t => t.OrderId)
-            .HasDatabaseName("IX_AltanTransaccionesRecargas_OrderId")
-            .HasFilter("[OrderId] IS NOT NULL");
+            .HasDatabaseName("IX_AltanTransaccionesRecargas_OrderId");
 
         builder.HasIndex(t => t.CreatedAt)
             .HasDatabaseName("IX_AltanTransaccionesRecargas_CreatedAt");
     }
 }
-
