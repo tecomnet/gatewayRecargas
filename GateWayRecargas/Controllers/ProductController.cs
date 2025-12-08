@@ -182,16 +182,16 @@ namespace GateWayRecargas.Controllers
                 // Guardar transacción exitosa en base de datos
                 await GuardarTransaccionEnBD(
                     inicioTransaccionCanalDeVenta,
-                    inicioTransaccionAltan,
+                    inicioTransaccionAltan ?? inicioTransaccionCanalDeVenta,
                     finTransaccionAltan,
                     beId ?? "N/A",
                     request.Msisdn,
                     montoRecarga,
                     offerId,
-                    request.ChannelOfSale,
-                    request.PipeOfSale,
-                    request.IdPoS,
-                    purchaseResponse.Order?.Id,
+                    request.ChannelOfSale ?? "RETAILER",
+                    request.PipeOfSale ?? "GATEWAY_RECARGA",
+                    request.IdPoS ?? "N/A",
+                    purchaseResponse.Order?.Id ?? "N/A",
                     "EXITOSO",
                     cancellationToken);
 
@@ -206,7 +206,7 @@ namespace GateWayRecargas.Controllers
                 // Guardar transacción fallida
                 await GuardarTransaccionEnBD(
                     inicioTransaccionCanalDeVenta,
-                    inicioTransaccionAltan,
+                    inicioTransaccionAltan ?? inicioTransaccionCanalDeVenta,
                     finTransaccionAltan ?? DateTime.UtcNow,
                     beId ?? "N/A",
                     request?.Msisdn ?? "N/A",
@@ -214,8 +214,8 @@ namespace GateWayRecargas.Controllers
                     offerId,
                     request?.ChannelOfSale ?? "N/A",
                     request?.PipeOfSale ?? "N/A",
-                    request?.IdPoS,
-                    null,
+                    request?.IdPoS ?? "N/A",
+                    "N/A",
                     "ERROR_VALIDACION",
                     cancellationToken);
                 
@@ -232,7 +232,7 @@ namespace GateWayRecargas.Controllers
                 // Guardar transacción fallida
                 await GuardarTransaccionEnBD(
                     inicioTransaccionCanalDeVenta,
-                    inicioTransaccionAltan,
+                    inicioTransaccionAltan ?? inicioTransaccionCanalDeVenta,
                     finTransaccionAltan ?? DateTime.UtcNow,
                     beId ?? "N/A",
                     request.Msisdn,
@@ -240,8 +240,8 @@ namespace GateWayRecargas.Controllers
                     offerId,
                     request.ChannelOfSale,
                     request.PipeOfSale,
-                    request.IdPoS,
-                    null,
+                    request.IdPoS ?? "N/A",
+                    "N/A",
                     "ERROR_401",
                     cancellationToken);
                 
@@ -258,7 +258,7 @@ namespace GateWayRecargas.Controllers
                 // Guardar transacción fallida
                 await GuardarTransaccionEnBD(
                     inicioTransaccionCanalDeVenta,
-                    inicioTransaccionAltan,
+                    inicioTransaccionAltan ?? inicioTransaccionCanalDeVenta,
                     finTransaccionAltan ?? DateTime.UtcNow,
                     beId ?? "N/A",
                     request.Msisdn,
@@ -266,8 +266,8 @@ namespace GateWayRecargas.Controllers
                     offerId,
                     request.ChannelOfSale,
                     request.PipeOfSale,
-                    request.IdPoS,
-                    null,
+                    request.IdPoS ?? "N/A",
+                    "N/A",
                     "ERROR_400",
                     cancellationToken);
                 
@@ -284,7 +284,7 @@ namespace GateWayRecargas.Controllers
                 // Guardar transacción fallida
                 await GuardarTransaccionEnBD(
                     inicioTransaccionCanalDeVenta,
-                    inicioTransaccionAltan,
+                    inicioTransaccionAltan ?? inicioTransaccionCanalDeVenta,
                     finTransaccionAltan ?? DateTime.UtcNow,
                     beId ?? "N/A",
                     request.Msisdn,
@@ -292,8 +292,8 @@ namespace GateWayRecargas.Controllers
                     offerId,
                     request.ChannelOfSale,
                     request.PipeOfSale,
-                    request.IdPoS,
-                    null,
+                    request.IdPoS ?? "N/A",
+                    "N/A",
                     "ERROR_404",
                     cancellationToken);
                 
@@ -310,7 +310,7 @@ namespace GateWayRecargas.Controllers
                 // Guardar transacción fallida
                 await GuardarTransaccionEnBD(
                     inicioTransaccionCanalDeVenta,
-                    inicioTransaccionAltan,
+                    inicioTransaccionAltan ?? inicioTransaccionCanalDeVenta,
                     finTransaccionAltan ?? DateTime.UtcNow,
                     beId ?? "N/A",
                     request.Msisdn,
@@ -318,8 +318,8 @@ namespace GateWayRecargas.Controllers
                     offerId,
                     request.ChannelOfSale,
                     request.PipeOfSale,
-                    request.IdPoS,
-                    null,
+                    request.IdPoS ?? "N/A",
+                    "N/A",
                     "ERROR_500",
                     cancellationToken);
                 
@@ -336,7 +336,7 @@ namespace GateWayRecargas.Controllers
         /// </summary>
         private async Task GuardarTransaccionEnBD(
             DateTime inicioTransaccionCanalDeVenta,
-            DateTime? inicioTransaccionAltan,
+            DateTime inicioTransaccionAltan,
             DateTime? finTransaccionAltan,
             string be,
             string msisdn,
@@ -344,11 +344,12 @@ namespace GateWayRecargas.Controllers
             string offerId,
             string canalDeVenta,
             string medio,
-            string? idPOS,
-            string? orderId,
-            string? resultadoTransaccion,
+            string idPOS,
+            string orderId,
+            string resultadoTransaccion,
             CancellationToken cancellationToken)
         {
+            _logger.LogWarning("=== MÉTODO GuardarTransaccionEnBD INVOCADO ===");
             try
             {
                 _logger.LogInformation("=== INICIANDO GUARDADO DE TRANSACCIÓN ===");
@@ -361,27 +362,29 @@ namespace GateWayRecargas.Controllers
                 // Validar campos requeridos antes de crear el objeto
                 if (string.IsNullOrWhiteSpace(msisdn))
                 {
-                    _logger.LogError("MSISDN está vacío. No se puede guardar la transacción.");
+                    _logger.LogError("VALIDACIÓN FALLIDA: MSISDN está vacío. No se puede guardar la transacción.");
                     return;
                 }
                 
                 if (string.IsNullOrWhiteSpace(offerId))
                 {
-                    _logger.LogError("OfferId está vacío. No se puede guardar la transacción.");
+                    _logger.LogError("VALIDACIÓN FALLIDA: OfferId está vacío. No se puede guardar la transacción.");
                     return;
                 }
                 
                 if (string.IsNullOrWhiteSpace(canalDeVenta))
                 {
-                    _logger.LogError("CanalDeVenta está vacío. No se puede guardar la transacción.");
+                    _logger.LogError("VALIDACIÓN FALLIDA: CanalDeVenta está vacío. No se puede guardar la transacción.");
                     return;
                 }
                 
                 if (string.IsNullOrWhiteSpace(medio))
                 {
-                    _logger.LogError("Medio está vacío. No se puede guardar la transacción.");
+                    _logger.LogError("VALIDACIÓN FALLIDA: Medio está vacío. No se puede guardar la transacción.");
                     return;
                 }
+                
+                _logger.LogInformation("Todas las validaciones pasaron. Procediendo a crear objeto transacción...");
 
                 var transaccion = new AltanTransaccionRecarga
                 {
@@ -395,9 +398,9 @@ namespace GateWayRecargas.Controllers
                     OfferId = offerId,
                     CanalDeVenta = canalDeVenta,
                     Medio = medio,
-                    IdPOS = idPOS,
-                    OrderId = orderId,
-                    ResultadoTransaccion = resultadoTransaccion,
+                    IdPOS = idPOS ?? "N/A",
+                    OrderId = orderId ?? "N/A",
+                    ResultadoTransaccion = resultadoTransaccion ?? "N/A",
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -415,8 +418,19 @@ namespace GateWayRecargas.Controllers
             {
                 // No lanzamos la excepción para no interrumpir el flujo principal
                 // Solo la logueamos con más detalle para debugging
-                _logger.LogError(ex, "Error al guardar transacción en base de datos. MSISDN: {Msisdn}, OrderId: {OrderId}, Exception: {ExceptionMessage}, StackTrace: {StackTrace}",
-                    msisdn, orderId, ex.Message, ex.StackTrace);
+                _logger.LogError(ex, "=== ERROR AL GUARDAR TRANSACCIÓN EN BASE DE DATOS ===");
+                _logger.LogError("MSISDN: {Msisdn}, OrderId: {OrderId}", msisdn, orderId);
+                _logger.LogError("Exception Type: {ExceptionType}", ex.GetType().Name);
+                _logger.LogError("Exception Message: {ExceptionMessage}", ex.Message);
+                _logger.LogError("Inner Exception: {InnerException}", ex.InnerException?.Message ?? "None");
+                _logger.LogError("Stack Trace: {StackTrace}", ex.StackTrace);
+                
+                // Si hay una excepción de Entity Framework, loguear más detalles
+                if (ex.InnerException != null)
+                {
+                    _logger.LogError("Inner Exception Type: {InnerType}", ex.InnerException.GetType().Name);
+                    _logger.LogError("Inner Exception Message: {InnerMessage}", ex.InnerException.Message);
+                }
             }
         }
     }
