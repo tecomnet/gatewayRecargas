@@ -8,13 +8,10 @@ public class AltanOfferConfiguration : IEntityTypeConfiguration<AltanOffer>
 {
     public void Configure(EntityTypeBuilder<AltanOffer> builder)
     {
-        // Nombre de la tabla
         builder.ToTable("AltanOffers");
 
-        // Clave primaria
         builder.HasKey(a => a.Id);
 
-        // Configuración de columnas
         builder.Property(a => a.Id)
             .HasColumnName("Id")
             .IsRequired();
@@ -52,7 +49,6 @@ public class AltanOfferConfiguration : IEntityTypeConfiguration<AltanOffer>
             .HasColumnName("MvnoId")
             .IsRequired(false);
 
-        // Configurar Foreign Key hacia Mvnos
         builder.HasOne(a => a.Mvno)
             .WithMany(m => m.AltanOffers)
             .HasForeignKey(a => a.MvnoId)

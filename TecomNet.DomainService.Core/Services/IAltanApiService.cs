@@ -8,5 +8,7 @@ namespace TecomNet.DomainService.Core.Services
         Task<TokenResponse> GetAccessTokenAsync(CancellationToken cancellationToken = default);
         Task<MsisdnInformationResponse> GetMsisdnInformationAsync(string msisdn, CancellationToken cancellationToken = default);
         Task<MsisdnInformationResponse> GetMsisdnInformationAsync(string msisdn, string accessToken, CancellationToken cancellationToken = default);
+        Task<PurchaseProductResponse> PurchaseProductAsync(PurchaseProductRequest request, CancellationToken cancellationToken = default);
+        Task<PurchaseProductResponse> PurchaseProductAsync(PurchaseProductRequest request, string accessToken, CancellationToken cancellationToken = default);
     }
 }

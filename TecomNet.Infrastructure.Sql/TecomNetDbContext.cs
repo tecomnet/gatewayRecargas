@@ -10,6 +10,7 @@ public class TecomNetDbContext : DbContext
     }
 
     public DbSet<AltanOffer> AltanOffers { get; set; }
+    public DbSet<AltanTransaccionRecarga> AltanTransaccionesRecargas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

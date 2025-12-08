@@ -94,6 +94,15 @@ namespace GateWayRecargas.Controllers
                     message = ex.Message
                 });
             }
+            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            {
+                _logger.LogError(ex, "Endpoint no encontrado para MSISDN: {Msisdn}", msisdn);
+                return StatusCode(StatusCodes.Status404NotFound, new
+                {
+                    error = "Endpoint no encontrado",
+                    message = ex.Message
+                });
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al obtener información de MSISDN: {Msisdn}", msisdn);
