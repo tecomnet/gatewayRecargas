@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
@@ -9,6 +10,8 @@ namespace GateWayRecargas.Controllers
 {
     [ApiController]
     [Route("/api/v1.0/[controller]")]
+    [Tags("2. Altan - Ofertas")]
+    [Authorize] // Requiere autenticación JWT
     public class AltanOfferController : ControllerBase
     {
         private readonly TecomNetDbContext _context;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
@@ -8,6 +9,8 @@ namespace GateWayRecargas.Controllers
 {
     [ApiController]
     [Route("/api/v1.0/[controller]")]
+    [Tags("2. Altan - MSISDN")]
+    [Authorize] // Requiere autenticación JWT
     public class MsisdnController : ControllerBase
     {
         private readonly IAltanApiService _altanApiService;

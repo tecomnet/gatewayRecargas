@@ -1,6 +1,4 @@
 using System.Text;
-using Hangfire;
-using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -21,14 +19,29 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1.0" 
     });
     
+    // Usar el atributo [Tags] si está disponible, sino usar nombre del controlador
+    c.TagActionsBy(api =>
+    {
+        // Buscar el atributo [Tags] en los metadatos
+        var controllerType = api.ActionDescriptor.RouteValues["controller"];
+        
+        // Si el controlador tiene atributo [Tags], usarlo
+        // Por ahora, usaremos el nombre del controlador y el DocumentFilter ordenará
+        return new[] { controllerType ?? "Default" };
+    });
+    
+    // Configurar orden de tags explícitamente
+    c.DocumentFilter<GateWayRecargas.Filters.SwaggerTagOrderDocumentFilter>();
+    
     // Configurar JWT en Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header usando el esquema Bearer. Ejemplo: \"Authorization: Bearer {token}\"",
+        Description = "Ingresa tu token JWT obtenido del endpoint de login. Solo pega el token sin la palabra 'Bearer'.",
         Name = "Authorization",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
     
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -100,39 +113,12 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// Configurar Hangfire
-builder.Services.AddHangfire(config => config
-    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-    .UseSimpleAssemblyNameTypeSerializer()
-    .UseRecommendedSerializerSettings()
-    .UseSqlServerStorage(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new SqlServerStorageOptions
-        {
-            CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-            SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-            QueuePollInterval = TimeSpan.Zero,
-            UseRecommendedIsolationLevel = true,
-            DisableGlobalLocks = true
-        }));
-
-builder.Services.AddHangfireServer(options =>
-{
-    options.WorkerCount = 1;
-});
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
-    // Hangfire Dashboard (solo en desarrollo)
-    app.UseHangfireDashboard("/hangfire", new DashboardOptions
-    {
-        Authorization = new[] { new GateWayRecargas.HangfireAuthorizationFilter() }
-    });
 }
 
 app.UseHttpsRedirection();
@@ -140,19 +126,6 @@ app.UseHttpsRedirection();
 // IMPORTANTE: UseAuthentication debe ir ANTES de UseAuthorization
 app.UseAuthentication();
 app.UseAuthorization();
-
-// Hangfire Dashboard para producción (opcional, con autenticación)
-// app.UseHangfireDashboard("/hangfire", new DashboardOptions { ... });
-
-// Programar job diario
-RecurringJob.AddOrUpdate<GateWayRecargas.BackgroundJobs.GenerarReporteDiarioJob>(
-    "generar-reporte-diario",
-    job => job.ExecuteAsync(CancellationToken.None),
-    Cron.Daily(1, 0), // Ejecutar diariamente a la 1:00 AM (hora UTC)
-    new RecurringJobOptions
-    {
-        TimeZone = TimeZoneInfo.Utc
-    });
 
 app.MapControllers();
 

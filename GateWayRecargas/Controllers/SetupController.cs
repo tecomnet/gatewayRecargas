@@ -12,6 +12,7 @@ namespace GateWayRecargas.Controllers;
 /// </summary>
 [ApiController]
 [Route("/api/v1.0/[controller]")]
+[Tags("1. Autenticación JWT")]
 [AllowAnonymous] // Temporal - eliminar en producción
 public class SetupController : ControllerBase
 {
@@ -24,63 +25,53 @@ public class SetupController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost("create-test-user")]
+    [HttpPost("update-password")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> CreateTestUser([FromBody] CreateUserRequest request)
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdatePassword([FromBody] UpdatePasswordRequest request)
     {
         try
         {
-            // Verificar si el usuario ya existe
-            var exists = await _context.Users
-                .AnyAsync(u => u.Username == request.Username || u.Email == request.Email);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == request.Username);
 
-            if (exists)
+            if (user == null)
             {
-                return BadRequest(new { error = "El usuario o email ya existe" });
+                return NotFound(new { error = "Usuario no encontrado" });
             }
 
-            // Generar hash del password
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password, BCrypt.Net.BCrypt.GenerateSalt(11));
+            // Generar nuevo hash del password
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = passwordHash,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            };
+            user.PasswordHash = passwordHash;
 
-            _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Usuario de prueba creado: {Username}", request.Username);
+            _logger.LogInformation("Password actualizado para usuario: {Username}", request.Username);
 
             return Ok(new
             {
-                message = "Usuario creado exitosamente",
-                username = user.Username,
-                email = user.Email
+                message = "Password actualizado exitosamente",
+                username = user.Username
             });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error al crear usuario de prueba");
+            _logger.LogError(ex, "Error al actualizar password");
             return StatusCode(StatusCodes.Status500InternalServerError, new
             {
-                error = "Error al crear usuario",
+                error = "Error al actualizar password",
                 message = ex.Message
             });
         }
     }
+
 }
 
-public class CreateUserRequest
+public class UpdatePasswordRequest
 {
     public string Username { get; set; } = null!;
-    public string Email { get; set; } = null!;
     public string Password { get; set; } = null!;
 }
 
