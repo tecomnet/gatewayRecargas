@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TecomNet.DomainService.Core.Services;
 
@@ -5,6 +6,8 @@ namespace GateWayRecargas.Controllers;
 
 [ApiController]
 [Route("/api/v1.0/[controller]")]
+[Tags("3. Reportes")]
+[Authorize] // Requiere autenticación JWT
 public class ReporteController : ControllerBase
 {
     private readonly IReporteRecargasService _reporteRecargasService;

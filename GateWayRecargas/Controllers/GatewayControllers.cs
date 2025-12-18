@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TecomNet.Domain.Models;
 using TecomNet.DomainService.Core.Services;
@@ -6,6 +7,8 @@ namespace GateWayRecargas.Controllers
 {
     [ApiController]
     [Route("/api/v1.0/[controller]")]
+    [Tags("2. Altan - Token")]
+    [Authorize] // Requiere autenticación JWT
     public class TokenController : ControllerBase
     {
         private readonly IAltanApiService _altanApiService;

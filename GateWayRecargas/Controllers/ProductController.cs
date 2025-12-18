@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +10,8 @@ namespace GateWayRecargas.Controllers
 {
     [ApiController]
     [Route("/api/v1.0/[controller]")]
+    [Tags("2. Altan - Recargas")]
+    [Authorize] // Requiere autenticación JWT
     public class ProductController : ControllerBase
     {
         private readonly IAltanApiService _altanApiService;
